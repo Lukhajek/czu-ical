@@ -17,6 +17,57 @@ function getParamFromUrl(url: string, name: string) {
   return usp.get(name);
 }
 
+const VTIMEZONE_PRAGUE = `BEGIN:VTIMEZONE
+TZID:Europe/Prague
+X-LIC-LOCATION:Europe/Prague
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE`;
+
+function insertVTimezoneAfterBeginCalendar(content: string, eol: string) {
+  const re = /^BEGIN:VCALENDAR([ \t]*)(\r\n|\n)/im;
+  if (re.test(content)) {
+    return content.replace(re, (m, p1, nl) => {
+      return `BEGIN:VCALENDAR${p1}${nl}${VTIMEZONE_PRAGUE.replace(
+        /\n/g,
+        eol,
+      )}${eol}`;
+    });
+  } else {
+    return `${VTIMEZONE_PRAGUE.replace(/\n/g, eol)}${eol}${content}`;
+  }
+}
+
+function transformToPrague(content: string) {
+  const eol = content.includes('\r\n') ? '\r\n' : '\n';
+  let out = content;
+
+  out = out.replace(/TZID=floating/gi, 'TZID=Europe/Prague');
+
+  const hasPragueVtimezone =
+    /BEGIN:VTIMEZONE[\s\S]*?TZID:Europe\/Prague[\s\S]*?END:VTIMEZONE/i.test(
+      out,
+    );
+
+  if (!hasPragueVtimezone) {
+    out = insertVTimezoneAfterBeginCalendar(out, eol);
+  }
+
+  return out;
+}
+
 calendarRouter.get('/my.ical', async (req, res) => {
   let loginName: string, password: string;
   try {
@@ -77,5 +128,5 @@ calendarRouter.get('/my.ical', async (req, res) => {
     }),
   });
 
-  res.send(timeTableResponse.data);
+  res.send(transformToPrague(timeTableResponse.data));
 });
