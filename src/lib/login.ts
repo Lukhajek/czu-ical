@@ -2,7 +2,6 @@ import axios from 'axios';
 import qs from 'qs';
 
 export default async function login(login: string, password: string) {
-  console.log(login, password);
   const response = await axios.request({
     method: 'post',
     maxBodyLength: Infinity,
