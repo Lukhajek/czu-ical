@@ -39,7 +39,7 @@ END:VTIMEZONE`;
 function insertVTimezoneAfterBeginCalendar(content: string, eol: string) {
   const re = /^BEGIN:VCALENDAR([ \t]*)(\r\n|\n)/im;
   if (re.test(content)) {
-    return content.replace(re, (m, p1, nl) => {
+    return content.replace(re, (_m, p1, nl) => {
       return `BEGIN:VCALENDAR${p1}${nl}${VTIMEZONE_PRAGUE.replace(
         /\n/g,
         eol,
@@ -128,5 +128,12 @@ calendarRouter.get('/my.ical', async (req, res) => {
     }),
   });
 
-  res.send(transformToPrague(timeTableResponse.data));
+  const transformedTimeTable = transformToPrague(timeTableResponse.data);
+
+  console.log(
+    `${new Date().toISOString()} - Time table endpoint returned ${
+      transformedTimeTable.length
+    } characters for ${loginName}`,
+  );
+  res.send(transformedTimeTable);
 });
