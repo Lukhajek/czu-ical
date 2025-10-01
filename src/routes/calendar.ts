@@ -81,7 +81,6 @@ calendarRouter.get('/my.ical', async (req, res) => {
   });
 
   const transformedTimeTable = ical.parseICS(timeTableResponse.data);
-  console.log(transformedTimeTable);
 
   const events = Object.values(transformedTimeTable).filter(
     (event) => event.type === 'VEVENT',
