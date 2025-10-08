@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import login from '../lib/login';
-import { z } from 'zod';
-export const calendarRouter = Router();
-import qs from 'qs';
-import { JSDOM } from 'jsdom';
-import ical from 'node-ical';
 import * as ics from 'ics';
-import moment from 'moment';
+import { JSDOM } from 'jsdom';
+import moment from 'moment-timezone';
+import ical from 'node-ical';
+import qs from 'qs';
+import { z } from 'zod';
+import login from '../lib/login';
+export const calendarRouter = Router();
 
 const schema = z.object({
   login: z.string(),
@@ -92,17 +92,21 @@ calendarRouter.get('/my.ical', async (req, res) => {
       uid: event.uid,
       description: event.description,
       location: event.location,
-      start: moment(event.start)
+      start: moment
+        .tz(event.start.toISOString(), 'Europe/Prague')
+        .utc()
         .format('YYYY-M-D-H-m')
         .split('-')
         .map((a) => parseInt(a)) as [number, number, number, number, number],
-      startInputType: 'local',
+      startInputType: 'utc',
       startOutputType: 'utc',
-      end: moment(event.end)
+      end: moment
+        .tz(event.end.toISOString(), 'Europe/Prague')
+        .utc()
         .format('YYYY-M-D-H-m')
         .split('-')
         .map((a) => parseInt(a)) as [number, number, number, number, number],
-      endInputType: 'local',
+      endInputType: 'utc',
       endOutputType: 'utc',
     })),
     {

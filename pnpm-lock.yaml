@@ -35,6 +35,9 @@ importers:
       moment:
         specifier: ^2.30.1
         version: 2.30.1
+      moment-timezone:
+        specifier: ^0.6.0
+        version: 0.6.0
       node-ical:
         specifier: ^0.21.0
         version: 0.21.0
