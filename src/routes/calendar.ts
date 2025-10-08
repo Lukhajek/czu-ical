@@ -89,7 +89,7 @@ calendarRouter.get('/my.ical', async (req, res) => {
   const { error, value } = ics.createEvents(
     events.map((event) => ({
       title: event.summary,
-      uid: event.uid,
+      uid: event.uid.substring(event.uid.indexOf(':') + 1) || event.uid,
       description: event.description,
       location: event.location,
       start: moment
