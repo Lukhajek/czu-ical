@@ -24,9 +24,13 @@ calendarRouter.get('/my.ical', async (req, res) => {
   let loginName: string, password: string;
   try {
     ({ login: loginName, password } = schema.parse(req.query));
-  } catch {
+  } catch (e) {
+    console.dir(e);
     return res.status(400).json({ error: 'Login and password are required' });
   }
+  console.log(
+    `${new Date().toISOString()} - Time table endpoint requested for ${loginName}`,
+  );
 
   const axiosInstance = await login(loginName, password);
 
