@@ -1,6 +1,7 @@
 import cors from 'cors';
 import express from 'express';
 import { calendarRouter } from './routes/calendar';
+process.env.TZ = 'Europe/Prague';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
